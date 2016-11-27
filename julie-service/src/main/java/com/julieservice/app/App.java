@@ -8,7 +8,6 @@ import java.io.*;
 import java.lang.*;
 import java.util.*;
 
-
 /**
  * Entry point of our service
  *
@@ -28,15 +27,30 @@ public class App
             String startDate = req.queryParams("startDate");
             String endDate = req.queryParams("endDate"); 
 
-            // TODO Verify parameters
+            Object serviceRes = null;
+            if (!Utils.isValidDate(startDate) ||
+               (endDate != null && !Utils.isValidDate(endDate))) {
 
-            MyHealth myHealth = new MyHealth();
-            HealthGetWeightRes myRes = myHealth.getWeights(startDate, endDate);
+                res.status(401);
+                SvcResponse failedRes = new SvcResponse();
+
+                failedRes.status = 401;
+                failedRes.message = "Invalid input.";
+
+                serviceRes = failedRes;
+            }
+            else {
+                MyHealth myHealth = new MyHealth();
+                HealthGetWeightRes goodRes = 
+                    myHealth.getWeights(startDate, endDate);
+
+                serviceRes = goodRes; 
+            }
 
             ObjectWriter ow = 
                 new ObjectMapper().writer().withDefaultPrettyPrinter();
 
-            String json = ow.writeValueAsString(myRes);
+            String json = ow.writeValueAsString(serviceRes);
             return json;
         });
     }

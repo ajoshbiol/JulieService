@@ -6,4 +6,5 @@ package com.julieservice.app;
 public class SvcResponse 
 {
     public int status;
+    public String message;
 }

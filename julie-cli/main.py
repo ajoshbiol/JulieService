@@ -1,4 +1,5 @@
 import sys
+import json
 import requests
 
 import configs
@@ -11,7 +12,7 @@ class WeightHandler:
         self.serviceUrl = configs.serviceUrl
 
     def getWeight(self):
-
+        print "\nGetting weight..."
         startDate = raw_input("Enter a start date: ")
         endDate = raw_input("Enter an end date: ")
         
@@ -25,17 +26,25 @@ class WeightHandler:
             raise Exception("Not a valid end date! " + 
                 "Please enter a valid date or empty.")
 
-        query = "http://localhost:4567/health/weight?startDate="
+        query = self.serviceUrl + "/health/weight?startDate="
         query = query + startDate
 
         if endDate != "":
             query = query + "&endDate=" + endDate
 
         r = requests.get(query)
-        print r.json()
 
-    def run(self, command):
-        print 160
+        if r.status_code != 200:
+            raise Exception("Status Code: " + str(r.status_code) + 
+                " Service is not happy with our request. Try again.")
+            
+        response = json.loads(r.text.encode("utf-8"))
+        print "\n"
+
+        print "Date\t\tWeight(Lbs)"
+        print "==============================="
+        for data in response["weights"]:
+            print data["date"] + "\t" + str(data["weight"])
 
 class Menu:
     """Base menu class"""
