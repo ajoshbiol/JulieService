@@ -51,8 +51,9 @@ public class MySQL
                 ArrayList<Weight> weights = new ArrayList<Weight>();
                 while (rs.next()) {
                     Weight weight = new Weight();
-                    weight.setWeight(rs.getInt("weightInLbs"));
+                    weight.setWeight(rs.getDouble("weightInLbs"));
                     weight.setDate(rs.getDate("datetime"));
+                    weight.setId(rs.getInt("id"));
 
                     weights.add(weight);
                 }
