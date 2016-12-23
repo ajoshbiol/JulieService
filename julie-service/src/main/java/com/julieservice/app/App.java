@@ -66,6 +66,22 @@ public class App
             String json = ow.writeValueAsString(serviceRes);
             return json;
         });
+
+        // Updates a weight entry
+        put("/health/weight", (req, res) -> {
+            
+            String id = req.queryParams("id");
+            String date = req.queryParams("date");
+            String weight = req.queryParams("weight");
+
+            MyHealth myHealth = new MyHealth();
+            SvcResponse serviceRes = myHealth.updateWeight(id, date, weight);
+
+            res.status(serviceRes.status);
+
+            String json = ow.writeValueAsString(serviceRes);
+            return json;
+        });
     }
 
     // Allows access to config values

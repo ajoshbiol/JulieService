@@ -68,7 +68,7 @@ public class MyHealth
     // Function to handle deleting weight data
     public SvcResponse deleteWeight(String id) {
         
-        HealthWeightRes res= new HealthWeightRes();
+        HealthWeightRes res = new HealthWeightRes();
         if (!Utils.isValidInt(id)) {
             // Failed
             res.status = 401;
@@ -86,6 +86,34 @@ public class MyHealth
             }
         }
          
+        return res;
+    }
+
+    // Function to handle updating a weight entry
+    public SvcResponse updateWeight(String id, String date, String weight) {
+    
+        HealthWeightRes res = new HealthWeightRes();
+        if (!Utils.isValidInt(id) || 
+            !Utils.isValidDate(date) || 
+            !Utils.isValidDouble(weight)) {
+        
+            // Failed
+            res.status = 401;
+            res.message = "Invalid input."; 
+        }
+        else {
+        
+            boolean success = MySQL.updateWeight(id, date, weight);
+
+            if (!success) {
+                res.status = 500;
+                res.message = "MySQL internal error.";
+            }
+            else {
+                res.status = 200;
+            }
+        }
+
         return res;
     }
 }

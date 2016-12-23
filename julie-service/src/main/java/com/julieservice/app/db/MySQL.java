@@ -87,14 +87,13 @@ public class MySQL
 
         try {
         
-
             if (!connection.isValid(0)) {
                 connect();
             }
 
             double d = Double.parseDouble(weight);
             try(CallableStatement cStmt = 
-                connection.prepareCall("{call `addWeight`(?, ?)}")) {
+                connection.prepareCall("{call `addWeight`(?, ?)};")) {
 
                 cStmt.setString("_date", date);
                 cStmt.setDouble("_weight", d);
@@ -150,6 +149,38 @@ public class MySQL
         }
         catch (Exception ex) {
             System.out.println(ex); 
+        }
+
+        return false;
+    }
+
+    // Function to update existing weight data
+    public static boolean updateWeight(String id, String date, String weight) {
+    
+        ensureInit();
+
+        try {
+        
+            if (!connection.isValid(0)) {
+                connect();
+            }
+
+            int i = Integer.parseInt(id);
+            double d = Double.parseDouble(weight);
+
+            try(CallableStatement cStmt = 
+                connection.prepareCall("{call `updateWeight`(?, ?, ?)};")) {
+
+                cStmt.setInt(1, i);
+                cStmt.setString(2, date);
+                cStmt.setDouble(3, d);
+
+                cStmt.execute();
+                return true;
+            }
+        }
+        catch (SQLException sqlEx) {
+            System.out.println(sqlEx);
         }
 
         return false;
