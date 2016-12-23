@@ -42,4 +42,16 @@ public final class Utils
             return false;
         } 
     }
+
+    // Function to determine if a passed string is a valid int or not
+    public static boolean isValidInt(String i) {
+        
+        try {
+            Integer.parseInt(i);
+            return true; 
+        }
+        catch (Exception ex) {
+            return false;
+        } 
+    }
 }

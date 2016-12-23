@@ -44,7 +44,6 @@ public class MyHealth
         
         HealthWeightRes res = new HealthWeightRes();
         if (!Utils.isValidDate(date) || !Utils.isValidDouble(weight)) {
-            
             // Failed
             res.status = 401;
             res.message = "Invalid input."; 
@@ -63,6 +62,30 @@ public class MyHealth
             }
         }
 
+        return res;
+    }
+
+    // Function to handle deleting weight data
+    public SvcResponse deleteWeight(String id) {
+        
+        HealthWeightRes res= new HealthWeightRes();
+        if (!Utils.isValidInt(id)) {
+            // Failed
+            res.status = 401;
+            res.message = "Invalid input."; 
+        }
+        else {
+            boolean success = MySQL.deleteWeight(id);
+
+            if (!success) {
+                res.status = 500;
+                res.message = "MySQL internal error.";
+            }
+            else {
+                res.status = 200;
+            }
+        }
+         
         return res;
     }
 }

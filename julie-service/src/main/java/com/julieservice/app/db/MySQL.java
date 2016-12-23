@@ -4,9 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.sql.CallableStatement;
 import java.sql.Types;
+import java.sql.PreparedStatement;
 
 import java.util.*;
 
@@ -38,29 +38,39 @@ public class MySQL
             String query = "SELECT * FROM weights ";
 
             if (startDate != null) {
-                query = query + "WHERE datetime >= '" + startDate + "'";
+                query = query + "WHERE datetime >= ?";
             }
 
             if (endDate != null) {
-                query = query + " and datetime <= '" + endDate + "'";
+                query = query + " and datetime <= ?";
             }
 
             query += " ORDER BY datetime DESC;"; 
 
-            try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery(query)) {
-                
-                ArrayList<Weight> weights = new ArrayList<Weight>();
-                while (rs.next()) {
-                    Weight weight = new Weight();
-                    weight.setWeight(rs.getDouble("weightInLbs"));
-                    weight.setDate(rs.getDate("datetime"));
-                    weight.setId(rs.getInt("id"));
+            try (PreparedStatement pStmt = 
+                    connection.prepareStatement(query)) {
 
-                    weights.add(weight);
+                if (startDate != null) {
+                    pStmt.setString(1, startDate);
+                }
+                if (endDate != null) {
+                    pStmt.setString(2, endDate);
                 }
                 
-                return weights;
+                try (ResultSet rs = pStmt.executeQuery()) {
+                
+                    ArrayList<Weight> weights = new ArrayList<Weight>();
+                    while (rs.next()) {
+                        Weight weight = new Weight();
+                        weight.setWeight(rs.getDouble("weightInLbs"));
+                        weight.setDate(rs.getDate("datetime"));
+                        weight.setId(rs.getInt("id"));
+
+                        weights.add(weight);
+                    }
+                    
+                    return weights;
+                }
             }
         }
         catch (Exception ex) {
@@ -112,6 +122,37 @@ public class MySQL
         }
 
         return null;
+    }
+
+    // Function to delete weight data
+    public static boolean deleteWeight(String id) {
+        
+        ensureInit();
+
+        try {
+        
+            if (!connection.isValid(0)) {
+                connect();
+            }
+
+            int i = Integer.parseInt(id);
+
+            String query = "DELETE FROM weights WHERE id = ?;";
+
+            try (PreparedStatement pStmt = 
+                    connection.prepareStatement(query)) {
+            
+                pStmt.setInt(1, i);
+                pStmt.executeUpdate();
+
+                return true;
+            }
+        }
+        catch (Exception ex) {
+            System.out.println(ex); 
+        }
+
+        return false;
     }
 
     // Function to connect to our database

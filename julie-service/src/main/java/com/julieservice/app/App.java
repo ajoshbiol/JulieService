@@ -52,6 +52,20 @@ public class App
             String json = ow.writeValueAsString(serviceRes);
             return json;
         });
+
+        // Deletes a weight entry
+        delete("/health/weight", (req, res) -> {
+            
+            String id = req.queryParams("id");
+
+            MyHealth myHealth = new MyHealth();
+            SvcResponse serviceRes = myHealth.deleteWeight(id);
+
+            res.status(serviceRes.status);
+
+            String json = ow.writeValueAsString(serviceRes);
+            return json;
+        });
     }
 
     // Allows access to config values
