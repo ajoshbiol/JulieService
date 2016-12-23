@@ -1,36 +1,32 @@
 # Julie
 My personal assistant
 
-Setup instructions for Debian and Ubuntu based Linux distributions
+## Setup 
+Instructions are for Debian and Ubuntu based Linux distributions
 
-julie-service
-=======================================
-Dependencies: 
-
+### Dependencies
 java
+
     sudo apt-get install openjdk-8-jdk
 
 maven
 
-Ubuntu
     sudo apt-get install maven
-
-julie-cli
-=======================================
-Dependencies:
 
 python 2.7
 
 pip
+
     sudo apt-get install python-pip
 
 requests
+
     pip install requests
 
-database
-=======================================
+### Database
 
 MySQL
+
 https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-14-04
 
 Schema name: Julie
