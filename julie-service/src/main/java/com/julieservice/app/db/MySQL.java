@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.CallableStatement;
+import java.sql.Types;
 
 import java.util.*;
 
@@ -64,6 +66,50 @@ public class MySQL
         catch (Exception ex) {
             System.out.println(ex); 
         }  
+
+        return null;
+    }
+
+    // Function to add new weight data
+    public static Weight addWeight(String date, String weight) {
+    
+        ensureInit();
+
+        try {
+        
+
+            if (!connection.isValid(0)) {
+                connect();
+            }
+
+            double d = Double.parseDouble(weight);
+            try(CallableStatement cStmt = 
+                connection.prepareCall("{call `addWeight`(?, ?)}")) {
+
+                cStmt.setString("_date", date);
+                cStmt.setDouble("_weight", d);
+
+                boolean success = cStmt.execute();
+
+                if (!success) {
+                    return null;
+                }
+
+                try (ResultSet rs = cStmt.getResultSet()) {
+                
+                    rs.next();
+                    Weight w = new Weight();
+                    w.setWeight(d);
+                    w.setDate(Utils.convertStringToDate(date));
+                    w.setId(rs.getInt("id"));
+
+                    return w;
+                }
+            }
+        }
+        catch (Exception ex) {
+            System.out.println(ex); 
+        }
 
         return null;
     }

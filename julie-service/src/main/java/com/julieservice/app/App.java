@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.*;
 import java.io.*;
 import java.lang.*;
 import java.util.*;
+import java.text.*;
 
 /**
  * Entry point of our service
@@ -16,6 +17,7 @@ public class App
 {
     private static boolean isInitialized = false;
     private static Properties configs = null;
+    private static ObjectWriter ow = null;
 
     // Our App entry point
     public static void main(String[] args) {
@@ -27,28 +29,25 @@ public class App
             String startDate = req.queryParams("startDate");
             String endDate = req.queryParams("endDate"); 
 
-            Object serviceRes = null;
-            if (!Utils.isValidDate(startDate) ||
-               (endDate != null && !Utils.isValidDate(endDate))) {
+            MyHealth myHealth = new MyHealth();
+            SvcResponse serviceRes = myHealth.getWeights(startDate, endDate);
 
-                res.status(401);
-                SvcResponse failedRes = new SvcResponse();
+            res.status(serviceRes.status);
 
-                failedRes.status = 401;
-                failedRes.message = "Invalid input.";
+            String json = ow.writeValueAsString(serviceRes);
+            return json;
+        });
 
-                serviceRes = failedRes;
-            }
-            else {
-                MyHealth myHealth = new MyHealth();
-                HealthGetWeightRes goodRes = 
-                    myHealth.getWeights(startDate, endDate);
+        // Creates a new weight entry
+        post("/health/weight", (req, res) -> {
+        
+            String date = req.queryParams("date");
+            String weight = req.queryParams("weight");
 
-                serviceRes = goodRes; 
-            }
+            MyHealth myHealth = new MyHealth();
+            SvcResponse serviceRes = myHealth.addWeight(date, weight);
 
-            ObjectWriter ow = 
-                new ObjectMapper().writer().withDefaultPrettyPrinter();
+            res.status(serviceRes.status);
 
             String json = ow.writeValueAsString(serviceRes);
             return json;
@@ -77,6 +76,11 @@ public class App
         catch (IOException ex) {
             ex.printStackTrace(); 
         }
+
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ");
+        ObjectMapper om = new ObjectMapper();
+        om.setDateFormat(df);
+        ow = om.writer().withDefaultPrettyPrinter();
 
         isInitialized = true;
     }

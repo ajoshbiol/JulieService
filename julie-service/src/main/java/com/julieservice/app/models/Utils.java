@@ -14,9 +14,32 @@ public final class Utils
             Date date = format.parse(d);
             return true;
         }
-        catch (Exception e) {
-            System.out.println(e);
+        catch (Exception ex) {
             return false;
         }
+    }
+    
+    // Function to convert date string into Date object
+    public static Date convertStringToDate(String d) {
+        try {
+            DateFormat format = 
+                new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+            return format.parse(d);
+        }
+        catch (Exception ex) {
+            return null;
+        }
+    }
+
+    // Function to determine if a passed string is a valid double or not
+    public static boolean isValidDouble(String d) {
+        
+        try {
+            Double.parseDouble(d); 
+            return true; 
+        }
+        catch (Exception ex) {
+            return false;
+        } 
     }
 }
