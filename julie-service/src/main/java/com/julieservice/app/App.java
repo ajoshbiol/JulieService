@@ -24,6 +24,19 @@ public class App
 
         ensureInit();
 
+        // Makes sure that the requestor is valid
+        before((req, res) -> {
+            if (!configs.getProperty("serviceAuthentication").equals(
+                req.headers("Authorization"))) {
+
+                SvcResponse serviceRes = new SvcResponse();
+                serviceRes.status = 401;
+                serviceRes.message = "You are not welcome here!";
+                halt(serviceRes.status, ow.writeValueAsString(serviceRes));
+            }
+        });
+
+        // Gets weight entries
         get("/health/weight", (req, res) -> { 
 
             String startDate = req.queryParams("startDate");
