@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.CallableStatement;
+import java.sql.Statement;
 import java.sql.Types;
 import java.sql.PreparedStatement;
 
@@ -22,6 +23,10 @@ public class MySQL
     private static String dbPassword = null;
     private static Connection connection = null;
     
+    /*
+     *  Start weight related functions
+     */
+
     // Function to retrieve weight data within the start and 
     // end date parameters
     public static ArrayList<Weight> getWeights(String startDate, 
@@ -184,6 +189,80 @@ public class MySQL
         }
 
         return false;
+    }
+
+    /*
+     *  Start todo list related functions
+     */
+
+    public static int getIncompleteTodoCount() {
+    
+        ensureInit();
+
+        try {
+            
+            if (!connection.isValid(0)) {
+                connect();
+            }
+
+            String query = 
+                "SELECT COUNT(*) FROM todos WHERE completionDate is null;";
+
+            try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(query)) {
+            
+                rs.next();
+                return rs.getInt("COUNT(*)");
+            }
+        }
+        catch (Exception ex) {
+            System.out.println(ex);
+        }
+
+        return -1;
+    }
+
+    public static ArrayList<Todo> getTodos() {
+        return getTodos(0); 
+    }
+
+    public static ArrayList<Todo> getTodos(int id) {
+        
+        try {
+             
+            if (!connection.isValid(0)) {
+                connect();
+            }
+
+            String query = "SELECT * FROM todos WHERE id >= ? LIMIT 20;";
+
+            try (PreparedStatement pStmt = 
+                connection.prepareStatement(query)) {
+            
+                pStmt.setInt(1, id);    
+                
+                try (ResultSet rs = pStmt.executeQuery()) {
+                
+                    ArrayList<Todo> todos = new ArrayList<Todo>();
+                    while (rs.next()) {
+                    
+                        Todo todo = new Todo();
+                        todo.setId(rs.getInt("id"));
+                        todo.setTask(rs.getString("task"));
+                        todo.setCreationDate(rs.getDate("creationDate"));
+                        todo.setCompletionDate(rs.getDate("completionDate"));
+                        todos.add(todo);
+                    }
+
+                    return todos;
+                } 
+            }
+        }
+        catch (Exception ex) {
+        
+        } 
+
+        return null;
     }
 
     // Function to connect to our database

@@ -26,6 +26,7 @@ public class App
 
         // Makes sure that the requestor is valid
         before((req, res) -> {
+
             if (!configs.getProperty("serviceAuthentication").equals(
                 req.headers("Authorization"))) {
 
@@ -91,6 +92,34 @@ public class App
             SvcResponse serviceRes = myHealth.updateWeight(id, date, weight);
 
             res.status(serviceRes.status);
+
+            String json = ow.writeValueAsString(serviceRes);
+            return json;
+        });
+
+        // Gets current incomplete todo count
+        get("/productivity/todo", (req, res) -> {
+        
+            String query = req.queryParams("query");
+
+            MyProductivity myProd = new MyProductivity();
+            SvcResponse serviceRes = null;
+
+            if (query == null) {
+                serviceRes = new SvcResponse();
+                serviceRes.status = 401;
+                serviceRes.message = "Invalid request.";
+            }
+            else if (query.equals("incompleteTodoCount")) {
+
+                serviceRes = myProd.getIncompleteTaskCount();
+                res.status(serviceRes.status);
+            }
+            else {
+                serviceRes = new SvcResponse();
+                serviceRes.status = 401;
+                serviceRes.message = "Invalid request.";
+            }
 
             String json = ow.writeValueAsString(serviceRes);
             return json;
