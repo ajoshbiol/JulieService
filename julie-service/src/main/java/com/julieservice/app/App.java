@@ -31,8 +31,7 @@ public class App
                 req.headers("Authorization"))) {
 
                 SvcResponse serviceRes = new SvcResponse();
-                serviceRes.status = 401;
-                serviceRes.message = "You are not welcome here!";
+                serviceRes.setStatus(402);
                 halt(serviceRes.status, ow.writeValueAsString(serviceRes));
             }
         });
@@ -107,18 +106,22 @@ public class App
 
             if (query == null) {
                 serviceRes = new SvcResponse();
-                serviceRes.status = 401;
-                serviceRes.message = "Invalid request.";
+                serviceRes.setStatus(401);
             }
             else if (query.equals("incompleteTodoCount")) {
 
-                serviceRes = myProd.getIncompleteTaskCount();
+                serviceRes = myProd.getIncompleteTodoCount();
+                res.status(serviceRes.status);
+            }
+            else if (query.equals("todos")) {
+            
+                String lastId = req.queryParams("lastId");
+                serviceRes = myProd.getTodos(lastId);
                 res.status(serviceRes.status);
             }
             else {
                 serviceRes = new SvcResponse();
-                serviceRes.status = 401;
-                serviceRes.message = "Invalid request.";
+                serviceRes.setStatus(401);
             }
 
             String json = ow.writeValueAsString(serviceRes);

@@ -228,13 +228,15 @@ public class MySQL
 
     public static ArrayList<Todo> getTodos(int id) {
         
+        ensureInit();
+
         try {
              
             if (!connection.isValid(0)) {
                 connect();
             }
 
-            String query = "SELECT * FROM todos WHERE id >= ? LIMIT 20;";
+            String query = "SELECT * FROM todos WHERE id > ? LIMIT 20;";
 
             try (PreparedStatement pStmt = 
                 connection.prepareStatement(query)) {
@@ -259,7 +261,7 @@ public class MySQL
             }
         }
         catch (Exception ex) {
-        
+            System.out.println(ex);
         } 
 
         return null;
