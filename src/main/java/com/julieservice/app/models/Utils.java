@@ -54,4 +54,14 @@ public final class Utils
             return false;
         } 
     }
+
+    // Function to determine if a passed string is not null or empty
+    public static boolean isNullOrEmpty(String s) {
+        if (s == null) {
+            return true;
+        }
+        else { 
+            return s.trim().isEmpty();
+        }
+    }
 }

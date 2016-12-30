@@ -20,11 +20,17 @@ public class SvcResponse
 
         switch (status) {
         
+            case 200:
+                message = "OK";
+                break;
             case 401:
                 message = "Invalid request.";
                 break;
             case 402:
-                message = "you are not welcome here!";
+                message = "You are not welcome here!";
+                break;
+            case 502:
+                message = "Database internal error.";
                 break;
             default:
                 message = null;

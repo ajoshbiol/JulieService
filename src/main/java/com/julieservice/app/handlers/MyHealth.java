@@ -19,19 +19,17 @@ public class MyHealth
         if (!Utils.isValidDate(startDate) || 
             (endDate != null && !Utils.isValidDate(endDate))) {
             
-            res.status = 401;
-            res.message = "Invalid input.";
+            res.setStatus(401);
         }
         else {
         
             ArrayList<Weight> weights = MySQL.getWeights(startDate, endDate);
         
             if (weights == null) {
-                res.status = 500;
-                res.message = "MySQL internal error.";
+                res.setStatus(502);
             }
             else {
-                res.status = 200;
+                res.setStatus(200);
                 res.weights = weights;
             }
         }
@@ -44,20 +42,17 @@ public class MyHealth
         
         HealthWeightRes res = new HealthWeightRes();
         if (!Utils.isValidDate(date) || !Utils.isValidDouble(weight)) {
-            // Failed
-            res.status = 401;
-            res.message = "Invalid input."; 
+            res.setStatus(401);
         }
         else {
              
             Weight newWeight = MySQL.addWeight(date, weight);
 
             if (newWeight == null) {
-                res.status = 500;
-                res.message = "MySQL internal error.";
+                res.setStatus(502);
             }
             else {
-                res.status = 200;
+                res.setStatus(200);
                 res.weight = newWeight;
             }
         }
@@ -70,19 +65,16 @@ public class MyHealth
         
         HealthWeightRes res = new HealthWeightRes();
         if (!Utils.isValidInt(id)) {
-            // Failed
-            res.status = 401;
-            res.message = "Invalid input."; 
+            res.setStatus(401);
         }
         else {
             boolean success = MySQL.deleteWeight(id);
 
             if (!success) {
-                res.status = 500;
-                res.message = "MySQL internal error.";
+                res.setStatus(502);
             }
             else {
-                res.status = 200;
+                res.setStatus(200);
             }
         }
          

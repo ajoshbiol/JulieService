@@ -43,7 +43,8 @@ public class App
             String endDate = req.queryParams("endDate"); 
 
             MyHealth myHealth = new MyHealth();
-            SvcResponse serviceRes = myHealth.getWeights(startDate, endDate);
+            SvcResponse serviceRes = myHealth.getWeights(startDate, 
+                    endDate);
 
             res.status(serviceRes.status);
 
@@ -58,7 +59,8 @@ public class App
             String weight = req.queryParams("weight");
 
             MyHealth myHealth = new MyHealth();
-            SvcResponse serviceRes = myHealth.addWeight(date, weight);
+            SvcResponse serviceRes = myHealth.addWeight(date, 
+                    weight);
 
             res.status(serviceRes.status);
 
@@ -88,7 +90,9 @@ public class App
             String weight = req.queryParams("weight");
 
             MyHealth myHealth = new MyHealth();
-            SvcResponse serviceRes = myHealth.updateWeight(id, date, weight);
+            SvcResponse serviceRes = myHealth.updateWeight(id, 
+                    date, 
+                    weight);
 
             res.status(serviceRes.status);
 
@@ -96,7 +100,7 @@ public class App
             return json;
         });
 
-        // Gets current incomplete todo count
+        // Processes todo related get queries
         get("/productivity/todo", (req, res) -> {
         
             String query = req.queryParams("query");
@@ -108,24 +112,73 @@ public class App
                 serviceRes = new SvcResponse();
                 serviceRes.setStatus(401);
             }
-            else if (query.equals("incompleteTodoCount")) {
-
-                serviceRes = myProd.getIncompleteTodoCount();
-                res.status(serviceRes.status);
-            }
-            else if (query.equals("todos")) {
-            
-                String lastId = req.queryParams("lastId");
-                serviceRes = myProd.getTodos(lastId);
-                res.status(serviceRes.status);
-            }
             else {
-                serviceRes = new SvcResponse();
-                serviceRes.setStatus(401);
-            }
+                switch(query) {
+                
+                    case "incompleteTodoCount":
+                        serviceRes = myProd.getIncompleteTodoCount();
+                        res.status(serviceRes.status);
+                        break;
+                    case "todos":
+                        String lastId = req.queryParams("lastId");
+                        serviceRes = myProd.getTodos(lastId);
+                        res.status(serviceRes.status);
+                        break;
+                    default:
+                        serviceRes = new SvcResponse();
+                        serviceRes.setStatus(401);
+                        break; 
+                }
+            }            
 
             String json = ow.writeValueAsString(serviceRes);
             return json;
+        });
+
+        // Creates a todo item
+        post("/productivity/todo", (req, res) -> {
+        
+            String task = req.queryParams("task");
+
+            MyProductivity myProd = new MyProductivity();
+            SvcResponse serviceRes = myProd.createTodo(task);
+            res.status(serviceRes.status);
+
+            String json = ow.writeValueAsString(serviceRes);
+            return json;
+        });
+
+        // Deletes a todo item
+        delete("/productivity/todo", (req, res) -> {
+        
+            String id = req.queryParams("id");
+
+            MyProductivity myProd = new MyProductivity();
+            SvcResponse serviceRes = myProd.deleteTodo(id);
+            res.status(serviceRes.status);
+
+            String json = ow.writeValueAsString(serviceRes);
+            return json;
+        });
+
+        // Updates a todo item
+        put("productivity/todo", (req, res) -> {
+        
+            String id = req.queryParams("id");
+            String task = req.queryParams("task");
+            String creationDate = req.queryParams("creationDate");
+            String completionDate = req.queryParams("completionDate");
+
+            MyProductivity myProd = new MyProductivity();
+            SvcResponse serviceRes = myProd.updateTodo(id, 
+                    task, 
+                    creationDate, 
+                    completionDate);
+            res.status(serviceRes.status);
+
+            String json = ow.writeValueAsString(serviceRes);
+            return json;
+            
         });
     }
 

@@ -17,5 +17,5 @@ public class ProductivityTodoRes extends SvcResponse {
     public ArrayList<Todo> todos;
 
     @JsonProperty
-    public int count;
+    public Integer count;
 }

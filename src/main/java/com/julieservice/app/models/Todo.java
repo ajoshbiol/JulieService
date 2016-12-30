@@ -7,10 +7,10 @@ import java.util.Date;
  */
 public class Todo {
 
-    private int id;
+    private Integer id;
     private String task;
-    private Date creationDate;
-    private Date completionDate;
+    private long creationDate;
+    private long completionDate;
 
     public void setId(int id) {
         this.id = id;
@@ -20,15 +20,15 @@ public class Todo {
         this.task = task;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(long creationDate) {
         this.creationDate = creationDate;
     }
 
-    public void setCompletionDate(Date completionDate) {
+    public void setCompletionDate(long completionDate) {
         this.completionDate = completionDate;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -36,11 +36,11 @@ public class Todo {
         return task;
     }
 
-    public Date getCreationDate() {
+    public long getCreationDate() {
         return creationDate;
     }
 
-    public Date getCompletionDate() {
+    public long getCompletionDate() {
         return completionDate;
     }
 }
