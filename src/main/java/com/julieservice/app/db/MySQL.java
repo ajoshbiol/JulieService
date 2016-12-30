@@ -5,8 +5,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.CallableStatement;
+import java.sql.Statement;
 import java.sql.Types;
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 
 import java.util.*;
 
@@ -22,6 +24,10 @@ public class MySQL
     private static String dbPassword = null;
     private static Connection connection = null;
     
+    /*
+     *  Start weight related functions
+     */
+
     // Function to retrieve weight data within the start and 
     // end date parameters
     public static ArrayList<Weight> getWeights(String startDate, 
@@ -174,6 +180,193 @@ public class MySQL
                 cStmt.setInt(1, i);
                 cStmt.setString(2, date);
                 cStmt.setDouble(3, d);
+
+                cStmt.execute();
+                return true;
+            }
+        }
+        catch (SQLException sqlEx) {
+            System.out.println(sqlEx);
+        }
+
+        return false;
+    }
+
+    /*
+     *  Start todo list related functions
+     */
+
+    public static int getIncompleteTodoCount() {
+    
+        ensureInit();
+
+        try {
+            
+            if (!connection.isValid(0)) {
+                connect();
+            }
+
+            String query = 
+                "SELECT COUNT(*) FROM todos WHERE completionDate is null;";
+
+            try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(query)) {
+            
+                rs.next();
+                return rs.getInt("COUNT(*)");
+            }
+        }
+        catch (Exception ex) {
+            System.out.println(ex);
+        }
+
+        return -1;
+    }
+
+    public static ArrayList<Todo> getTodos() {
+        return getTodos(0); 
+    }
+
+    public static ArrayList<Todo> getTodos(int id) {
+        
+        ensureInit();
+
+        try {
+             
+            if (!connection.isValid(0)) {
+                connect();
+            }
+
+            String query = "SELECT * FROM todos WHERE id > ? LIMIT 20;";
+
+            try (PreparedStatement pStmt = 
+                connection.prepareStatement(query)) {
+            
+                pStmt.setInt(1, id);    
+                
+                try (ResultSet rs = pStmt.executeQuery()) {
+                
+                    ArrayList<Todo> todos = new ArrayList<Todo>();
+                    while (rs.next()) {
+                    
+                        Todo todo = new Todo();
+                        todo.setId(rs.getInt("id"));
+                        todo.setTask(rs.getString("task"));
+                        todo.setCreationDate(
+                            rs.getTimestamp("creationDate").getTime());
+                        Timestamp ts = rs.getTimestamp("completionDate");
+                        if (ts != null) {
+                            todo.setCompletionDate(ts.getTime());
+                        }
+                        todos.add(todo);
+                    }
+
+                    return todos;
+                } 
+            }
+        }
+        catch (Exception ex) {
+            System.out.println(ex);
+        } 
+
+        return null;
+    }
+
+    // Function to add a new task; Returns a new Todo object
+    public static Todo addTodo(String task) {
+    
+        ensureInit();
+
+        try {
+        
+            if (!connection.isValid(0)) {
+                connect();
+            }
+
+            try(CallableStatement cStmt = 
+                connection.prepareCall("{call `addTodo`(?)};")) {
+
+                cStmt.setString("_task", task);
+
+                boolean success = cStmt.execute();
+
+                if (!success) {
+                    return null;
+                }
+
+                try (ResultSet rs = cStmt.getResultSet()) {
+                
+                    rs.next();
+                    Todo t = new Todo();
+                    t.setId(rs.getInt("id"));
+                    t.setTask(task);
+                    t.setCreationDate(
+                        rs.getTimestamp("creationDate").getTime());
+
+                    return t;
+                }
+            }
+        }
+        catch (Exception ex) {
+            System.out.println(ex); 
+        }
+
+        return null;
+    }
+
+    // Function to delete a todo item
+    public static boolean deleteTodo(String id) {
+    
+        ensureInit();
+
+        try {
+        
+            if (!connection.isValid(0)) {
+                connect();
+            }
+
+            int i = Integer.parseInt(id);
+
+            String query = "DELETE FROM todos WHERE id = ?;";
+
+            try (PreparedStatement pStmt = 
+                    connection.prepareStatement(query)) {
+            
+                pStmt.setInt(1, i);
+                pStmt.executeUpdate();
+
+                return true;
+            }
+        }
+        catch (Exception ex) {
+            System.out.println(ex);
+        }
+
+        return false;
+    }
+
+
+    // Function to update existing todo item
+    public static boolean updateTodo(String id, String task, 
+        String creationDate, String completionDate) {
+    
+        ensureInit();
+
+        try {
+        
+            if (!connection.isValid(0)) {
+                connect();
+            }
+
+            int i = Integer.parseInt(id);
+
+            try(CallableStatement cStmt = 
+                connection.prepareCall("{call `updateTodo`(?, ?, ?, ?)};")) {
+
+                cStmt.setInt(1, i);
+                cStmt.setString(2, task);
+                cStmt.setString(3, creationDate);
+                cStmt.setString(4, completionDate);
 
                 cStmt.execute();
                 return true;
